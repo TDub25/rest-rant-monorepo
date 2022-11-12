@@ -4,6 +4,9 @@ const db = require("../models")
 const { Place, Comment, User } = db
 
 router.post('/', async (req, res) => {
+    if (req.currentUser?.role !== 'admin'){
+        return res.status(403).json({ message: 'You are not allowed to add a place'})
+    }
     if (!req.body.pic) {
         req.body.pic = 'http://placekitten.com/400/400'
     }
@@ -16,7 +19,6 @@ router.post('/', async (req, res) => {
     const place = await Place.create(req.body)
     res.json(place)
 })
-
 
 router.get('/', async (req, res) => {
     const places = await Place.findAll()
@@ -46,6 +48,9 @@ router.get('/:placeId', async (req, res) => {
 
 router.put('/:placeId', async (req, res) => {
     let placeId = Number(req.params.placeId)
+    if (req.currentUser?.role !== 'admin'){
+        return res.status(403).json({ message: 'You are not allowed to edit places'})
+    }
     if (isNaN(placeId)) {
         res.status(404).json({ message: `Invalid id "${placeId}"` })
     } else {
@@ -64,6 +69,9 @@ router.put('/:placeId', async (req, res) => {
 
 router.delete('/:placeId', async (req, res) => {
     let placeId = Number(req.params.placeId)
+    if (req.currentUser?.role !== 'admin'){
+        return res.status(403).json({ message: 'You are not allowed to delete places'})
+    }
     if (isNaN(placeId)) {
         res.status(404).json({ message: `Invalid id "${placeId}"` })
     } else {
